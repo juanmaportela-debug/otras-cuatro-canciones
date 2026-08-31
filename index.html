@@ -63,6 +63,51 @@
     color: var(--cream);
   }
 
+  /* ---- Escucha a la gorra ---- */
+  .gorra {
+    margin: 22px auto 0;
+    max-width: 420px;
+  }
+
+  .gorra-label {
+    font-size: 13px;
+    color: var(--cream);
+    opacity: 0.65;
+    margin: 0 0 10px;
+  }
+
+  .gorra-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .gorra-btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--sky-deep);
+    background: var(--cream);
+    border: none;
+    border-radius: 999px;
+    padding: 9px 18px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+
+  .gorra-btn:hover { transform: translateY(-1px); opacity: 0.92; }
+
+  .gorra-btn.libre {
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid rgba(241, 232, 214, 0.4);
+  }
+
   .subtitle {
     font-size: 14px;
     color: var(--cream);
@@ -162,6 +207,22 @@
     padding: 0;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+    position: relative;
+  }
+
+  .heart-num {
+    position: absolute;
+    left: 50%;
+    top: 54%;
+    transform: translate(-50%, -50%);
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(13px, 3.2vw, 17px);
+    color: var(--white);
+    opacity: 0.5;
+    pointer-events: none;
+    user-select: none;
+    line-height: 1;
   }
 
   .heart-btn:focus-visible {
@@ -263,7 +324,20 @@
     font-size: 14px;
     color: var(--cream);
     opacity: 0.5;
+    display: flex;
+    align-items: center;
+    gap: 5px;
   }
+
+  .track-num .mini-heart {
+    width: 12px;
+    height: 12px;
+    flex: none;
+    color: var(--red);
+  }
+
+  .track-num .mini-heart svg { width: 100%; height: 100%; display: block; }
+  .track-num .mini-heart svg path { fill: var(--red); }
 
   .track.playing .track-num { opacity: 0; position: relative; }
 
@@ -423,6 +497,17 @@
     <h1>Otras cuatro canciones de amor</h1>
   </header>
 
+  <div class="gorra">
+    <p class="gorra-label">Escucha a la gorra, si te gustó podés hacer un aporte para seguir apoyando las producciones independientes</p>
+    <div class="gorra-buttons">
+      <a class="gorra-btn" href="https://mpago.la/1ZKw1gW" target="_blank" rel="noopener">$500</a>
+      <a class="gorra-btn" href="https://mpago.la/2gL5bQV" target="_blank" rel="noopener">$1000</a>
+      <a class="gorra-btn" href="https://mpago.la/2j4GHTw" target="_blank" rel="noopener">$1500</a>
+      <a class="gorra-btn" href="https://mpago.la/2kKPEYa" target="_blank" rel="noopener">$2000</a>
+      <a class="gorra-btn libre" href="https://link.mercadopago.com.ar/escuchaalagorra" target="_blank" rel="noopener">Otro monto</a>
+    </div>
+  </div>
+
   <div class="hero">
     <span class="bg-numeral top" aria-hidden="true">4</span>
     <span class="bg-numeral bottom" aria-hidden="true">4</span>
@@ -432,15 +517,19 @@
       <div class="hearts" id="cardHearts">
         <button class="heart-btn" data-index="0" aria-label="Reproducir Canción 1">
           <span class="heart"><svg viewBox="0 0 32 29"><path d="M16 29C8 23.5 0 17.3 0 9.6 0 4.3 4 0 9 0c3 0 5.6 1.6 7 4 1.4-2.4 4-4 7-4 5 0 9 4.3 9 9.6 0 7.7-8 13.9-16 19.4z"/></svg></span>
+          <span class="heart-num" aria-hidden="true">1</span>
         </button>
         <button class="heart-btn" data-index="1" aria-label="Reproducir Canción 2">
           <span class="heart"><svg viewBox="0 0 32 29"><path d="M16 29C8 23.5 0 17.3 0 9.6 0 4.3 4 0 9 0c3 0 5.6 1.6 7 4 1.4-2.4 4-4 7-4 5 0 9 4.3 9 9.6 0 7.7-8 13.9-16 19.4z"/></svg></span>
+          <span class="heart-num" aria-hidden="true">2</span>
         </button>
         <button class="heart-btn" data-index="2" aria-label="Reproducir Canción 3">
           <span class="heart"><svg viewBox="0 0 32 29"><path d="M16 29C8 23.5 0 17.3 0 9.6 0 4.3 4 0 9 0c3 0 5.6 1.6 7 4 1.4-2.4 4-4 7-4 5 0 9 4.3 9 9.6 0 7.7-8 13.9-16 19.4z"/></svg></span>
+          <span class="heart-num" aria-hidden="true">3</span>
         </button>
         <button class="heart-btn" data-index="3" aria-label="Reproducir Canción 4">
           <span class="heart"><svg viewBox="0 0 32 29"><path d="M16 29C8 23.5 0 17.3 0 9.6 0 4.3 4 0 9 0c3 0 5.6 1.6 7 4 1.4-2.4 4-4 7-4 5 0 9 4.3 9 9.6 0 7.7-8 13.9-16 19.4z"/></svg></span>
+          <span class="heart-num" aria-hidden="true">4</span>
         </button>
       </div>
       <span class="corner bottom">4</span>
@@ -519,7 +608,7 @@
       row.className = "track";
       row.dataset.index = i;
       row.innerHTML = `
-        <span class="track-num">${i + 1}</span>
+        <span class="track-num"><span class="mini-heart"><svg viewBox="0 0 32 29"><path d="M16 29C8 23.5 0 17.3 0 9.6 0 4.3 4 0 9 0c3 0 5.6 1.6 7 4 1.4-2.4 4-4 7-4 5 0 9 4.3 9 9.6 0 7.7-8 13.9-16 19.4z"/></svg></span>${i + 1}</span>
         <span class="track-name">${track.title}</span>
         <span class="track-time" data-role="duration">${track.duration}</span>
       `;

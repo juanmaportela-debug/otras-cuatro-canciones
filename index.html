@@ -386,6 +386,79 @@
     margin: 16px 2px 0;
   }
 
+  /* ---- Encuesta ---- */
+  .poll {
+    margin-top: 34px;
+  }
+
+  .poll-row {
+    margin-bottom: 16px;
+  }
+
+  .poll-row:last-child { margin-bottom: 0; }
+
+  .poll-row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--cream);
+    margin-bottom: 6px;
+  }
+
+  .poll-row-head .pct {
+    font-size: 13px;
+    opacity: 0.6;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .poll-bar-track {
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(241, 232, 214, 0.14);
+    overflow: hidden;
+  }
+
+  .poll-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--red);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  .poll-vote-btn {
+    margin-top: 7px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--cream);
+    background: none;
+    border: 1px solid rgba(241, 232, 214, 0.35);
+    border-radius: 999px;
+    padding: 5px 14px;
+    cursor: pointer;
+  }
+
+  .poll-vote-btn:hover { background: rgba(241, 232, 214, 0.1); }
+
+  .poll-voted-tag {
+    display: inline-block;
+    margin-top: 7px;
+    font-size: 12px;
+    color: var(--cream);
+    opacity: 0.55;
+  }
+
+  .poll-note {
+    text-align: center;
+    font-size: 12px;
+    color: var(--cream);
+    opacity: 0.45;
+    margin: 14px 2px 0;
+  }
+
   footer {
     text-align: center;
     margin-top: 36px;
@@ -548,6 +621,14 @@
   </div>
 
   <p class="disclaimer">Disco completo · escuchalo directo acá, sin cuentas ni descargas.</p>
+
+  <div class="poll">
+    <div class="section-head">
+      <p class="section-title">¿Cuál es tu favorita?</p>
+    </div>
+    <div class="poll-list" id="pollList"></div>
+    <p class="poll-note" id="pollNote">Cargando resultados…</p>
+  </div>
 </div>
 
 <div class="player">
@@ -698,6 +779,85 @@
   });
 
   renderTracklist();
+
+  // ---- Encuesta: ¿cuál es tu favorita? ----
+  const POLL_API = "https://countapi.mileshilliard.com/api/v1";
+  const POLL_NAMESPACE = "jmp-otras-cuatro-canciones-de-amor";
+  const POLL_KEYS = TRACKS.map((_, i) => `${POLL_NAMESPACE}-cancion-${i + 1}`);
+  const VOTE_STORAGE_KEY = "jmp_otras4_poll_voted";
+
+  const pollListEl = document.getElementById("pollList");
+  const pollNoteEl = document.getElementById("pollNote");
+
+  function getVotedIndex() {
+    const v = localStorage.getItem(VOTE_STORAGE_KEY);
+    return v === null ? null : Number(v);
+  }
+
+  function renderPoll(counts) {
+    const total = counts.reduce((a, b) => a + b, 0);
+    const votedIndex = getVotedIndex();
+
+    pollListEl.innerHTML = TRACKS.map((track, i) => {
+      const pct = total ? Math.round((counts[i] / total) * 100) : 0;
+      const action = votedIndex === null
+        ? `<button class="poll-vote-btn" data-index="${i}">Votar</button>`
+        : (votedIndex === i ? `<span class="poll-voted-tag">Tu voto ✓</span>` : "");
+      return `
+        <div class="poll-row">
+          <div class="poll-row-head">
+            <span>${track.title}</span>
+            <span class="pct">${pct}%</span>
+          </div>
+          <div class="poll-bar-track"><div class="poll-bar-fill" style="width:${pct}%"></div></div>
+          ${action}
+        </div>
+      `;
+    }).join("");
+
+    if (votedIndex === null) {
+      pollListEl.querySelectorAll(".poll-vote-btn").forEach((btn) => {
+        btn.addEventListener("click", () => vote(Number(btn.dataset.index)));
+      });
+    }
+
+    pollNoteEl.textContent = total
+      ? `${total} voto${total === 1 ? "" : "s"} hasta ahora`
+      : "Sé el primero en votar";
+  }
+
+  async function fetchPollCounts() {
+    const results = await Promise.all(
+      POLL_KEYS.map((key) =>
+        fetch(`${POLL_API}/get/${key}`)
+          .then((r) => r.json())
+          .then((d) => d.value || 0)
+          .catch(() => 0)
+      )
+    );
+    return results;
+  }
+
+  async function vote(i) {
+    if (getVotedIndex() !== null) return;
+    localStorage.setItem(VOTE_STORAGE_KEY, String(i));
+    try {
+      await fetch(`${POLL_API}/hit/${POLL_KEYS[i]}`);
+    } catch (e) { /* si falla, igual marcamos localmente para no permitir doble click */ }
+    const counts = await fetchPollCounts();
+    renderPoll(counts);
+  }
+
+  async function initPoll() {
+    try {
+      const counts = await fetchPollCounts();
+      renderPoll(counts);
+    } catch (e) {
+      pollNoteEl.textContent = "No se pudo cargar la encuesta ahora mismo.";
+    }
+  }
+
+  initPoll();
 </script>
 
 </body>
